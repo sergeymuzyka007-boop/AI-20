@@ -12,7 +12,7 @@ const originalContent = document.getElementById('original-content');
 const annotatedContent = document.getElementById('annotated-content');
 
 // Конфігурація для API Gemini
-const apiKey = "";
+const apiKey = "AIzaSyB9ZyGuArCl-8zqAdMQWOAF0JthDp9irnQ";
 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
 // Обробник для кліка по області завантаження
