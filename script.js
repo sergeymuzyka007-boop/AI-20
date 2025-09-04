@@ -158,7 +158,16 @@ async function annotateDocument(text) {
     }
 
     const result = await response.json();
+    console.log("Full API Response:", result); // Додано для відладки
+
     const candidate = result.candidates?.[0];
+    const safetyRatings = candidate?.safetyRatings;
+
+    // Перевірка на "заборонений" контент
+    if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
+        throw new Error("Не удалось получить результат. Возможно, содержимое файла нарушает правила безопасности.");
+    }
+
     if (candidate && candidate.content?.parts?.[0]?.text) {
         return candidate.content.parts[0].text;
     } else {
