@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tools - Denys Muzyka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tool-card {
+            display: none;
+        }
+        .tool-card.active {
+            display: block;
+        }
+        /* Simple scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* dark-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* dark-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096; /* dark-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 antialiased">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800/50 p-6 flex flex-col fixed h-full">
+            <h1 class="text-2xl font-bold text-white mb-8" data-lang-key="title">Web Tools</h1>
+            <nav class="flex-grow">
+                <ul class="space-y-2" id="tool-menu">
+                    <!-- Tools will be dynamically inserted here -->
+                </ul>
+            </nav>
+            <div class="mt-auto">
+                <div class="flex items-center justify-between mb-4">
+                     <span class="text-sm" data-lang-key="language">Language:</span>
+                    <div class="flex space-x-2">
+                        <button id="lang-ua" class="px-2 py-1 text-sm rounded-md bg-gray-700 hover:bg-blue-600 transition-colors">UA</button>
+                        <button id="lang-en" class="px-2 py-1 text-sm rounded-md bg-blue-600 hover:bg-blue-700 transition-colors">EN</button>
+                    </div>
+                </div>
+                <p class="text-xs text-center text-gray-400" data-lang-key="developer">Developer: Denys Muzyka</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 p-8 overflow-y-auto">
+            <div id="tool-container">
+                <!-- Tool Cards will be rendered here -->
+
+                <!-- 1. Text Summarizer -->
+                <div id="summarizer" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="summarizer_title">Text Summarizer</h2>
+                    <p class="text-sm text-gray-400 mb-4" data-lang-key="summarizer_desc">Upload a .txt file or paste text to get a brief summary. This is a demo and extracts the first few sentences.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="summarizer-input" class="block text-sm font-medium mb-2" data-lang-key="input_text">Input Text</label>
+                             <textarea id="summarizer-input" rows="10" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="summarizer_placeholder"></textarea>
+                             <input type="file" id="file-input" accept=".txt" class="mt-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                        </div>
+                        <div>
+                            <label for="summarizer-output" class="block text-sm font-medium mb-2" data-lang-key="summary">Summary</label>
+                            <textarea id="summarizer-output" rows="10" class="w-full bg-gray-900 rounded-md p-3 border border-gray-700" readonly></textarea>
+                        </div>
+                    </div>
+                    <button id="summarize-btn" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold" data-lang-key="summarize_btn">Summarize</button>
+                </div>
+
+                <!-- 2. Translator -->
+                <div id="translator" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="translator_title">Translator</h2>
+                    <p class="text-sm text-gray-400 mb-4" data-lang-key="translator_desc">Translate text between Ukrainian and English. (UI Demo)</p>
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <span id="lang-from" class="font-semibold text-lg">Ukrainian</span>
+                        <button id="swap-lang-btn" class="p-2 rounded-full bg-gray-700 hover:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zM3 9a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" transform="rotate(90 10 10)" /></svg>
+                        </button>
+                        <span id="lang-to" class="font-semibold text-lg">English</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div>
+                            <textarea id="translator-input" rows="10" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="translator_placeholder_from"></textarea>
+                        </div>
+                        <div>
+                            <textarea id="translator-output" rows="10" class="w-full bg-gray-900 rounded-md p-3 border border-gray-700" readonly placeholder-key="translator_placeholder_to"></textarea>
+                        </div>
+                    </div>
+                     <button class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold" data-lang-key="translate_btn">Translate</button>
+                </div>
+                
+                <!-- 3. Word Counter -->
+                <div id="word-counter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="word_counter_title">Word & Character Counter</h2>
+                     <textarea id="word-counter-input" rows="8" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="word_counter_placeholder"></textarea>
+                    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="bg-gray-700/50 p-4 rounded-md">
+                            <p class="text-2xl font-bold" id="word-count">0</p>
+                            <p class="text-sm text-gray-400" data-lang-key="words">Words</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-md">
+                            <p class="text-2xl font-bold" id="char-count">0</p>
+                            <p class="text-sm text-gray-400" data-lang-key="characters">Characters</p>
+                        </div>
+                         <div class="bg-gray-700/50 p-4 rounded-md">
+                            <p class="text-2xl font-bold" id="sentence-count">0</p>
+                            <p class="text-sm text-gray-400" data-lang-key="sentences">Sentences</p>
+                        </div>
+                         <div class="bg-gray-700/50 p-4 rounded-md">
+                            <p class="text-2xl font-bold" id="paragraph-count">0</p>
+                            <p class="text-sm text-gray-400" data-lang-key="paragraphs">Paragraphs</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Case Converter -->
+                <div id="case-converter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="case_converter_title">Case Converter</h2>
+                     <textarea id="case-converter-input" rows="8" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="case_converter_placeholder"></textarea>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button class="case-btn flex-grow px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-blue-600 transition-colors" data-case="upper" data-lang-key="uppercase">UPPER CASE</button>
+                        <button class="case-btn flex-grow px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-blue-600 transition-colors" data-case="lower" data-lang-key="lowercase">lower case</button>
+                        <button class="case-btn flex-grow px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-blue-600 transition-colors" data-case="sentence" data-lang-key="sentence_case">Sentence case</button>
+                        <button class="case-btn flex-grow px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-blue-600 transition-colors" data-case="capitalized" data-lang-key="capitalized_case">Capitalized Case</button>
+                    </div>
+                </div>
+                
+                <!-- 5. Password Generator -->
+                <div id="password-generator" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="password_generator_title">Password Generator</h2>
+                    <div class="relative mb-4">
+                        <input type="text" id="password-output" class="w-full bg-gray-900 rounded-md p-3 pr-12 border border-gray-700 font-mono" readonly>
+                        <button id="copy-password-btn" class="absolute inset-y-0 right-0 px-3 flex items-center bg-blue-600 hover:bg-blue-700 rounded-r-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                        </button>
+                    </div>
+                     <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="pass-length" data-lang-key="password_length">Password Length</label>
+                            <input type="number" id="pass-length" value="16" min="4" max="64" class="w-20 bg-gray-700 text-center rounded-md p-1">
+                        </div>
+                        <input type="range" id="pass-length-slider" min="4" max="64" value="16" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex items-center"><input type="checkbox" id="inc-uppercase" class="h-4 w-4 rounded" checked><label for="inc-uppercase" class="ml-2" data-lang-key="include_uppercase">Include Uppercase (A-Z)</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="inc-lowercase" class="h-4 w-4 rounded" checked><label for="inc-lowercase" class="ml-2" data-lang-key="include_lowercase">Include Lowercase (a-z)</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="inc-numbers" class="h-4 w-4 rounded" checked><label for="inc-numbers" class="ml-2" data-lang-key="include_numbers">Include Numbers (0-9)</label></div>
+                        <div class="flex items-center"><input type="checkbox" id="inc-symbols" class="h-4 w-4 rounded" checked><label for="inc-symbols" class="ml-2" data-lang-key="include_symbols">Include Symbols (!@#$%^&*)</label></div>
+                    </div>
+                     <button id="generate-password-btn" class="mt-6 w-full px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold" data-lang-key="generate_password">Generate Password</button>
+                </div>
+                
+                <!-- 6. QR Code Generator -->
+                <div id="qr-generator" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="qr_code_generator_title">QR Code Generator</h2>
+                     <input type="text" id="qr-input" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700 mb-4" placeholder-key="qr_placeholder">
+                     <div id="qrcode" class="flex justify-center items-center bg-white p-4 rounded-md w-64 h-64 mx-auto"></div>
+                </div>
+                
+                 <!-- 7. Lorem Ipsum Generator -->
+                <div id="lorem-ipsum" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="lorem_ipsum_title">Lorem Ipsum Generator</h2>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <label for="lorem-count" data-lang-key="paragraphs">Paragraphs:</label>
+                        <input type="number" id="lorem-count" value="3" min="1" max="50" class="w-20 bg-gray-700 text-center rounded-md p-1">
+                        <button id="generate-lorem-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" data-lang-key="generate">Generate</button>
+                         <button id="copy-lorem-btn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600" data-lang-key="copy">Copy</button>
+                    </div>
+                     <textarea id="lorem-output" rows="12" class="w-full bg-gray-900 rounded-md p-3 border border-gray-700" readonly></textarea>
+                </div>
+                
+                <!-- 8. Hash Generator -->
+                <div id="hash-generator" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="hash_generator_title">Hash Generator</h2>
+                    <textarea id="hash-input" rows="5" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="hash_placeholder"></textarea>
+                    <div class="mt-4 space-y-2">
+                        <div>
+                            <label class="font-semibold">MD5</label>
+                            <input type="text" id="md5-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="font-semibold">SHA-1</label>
+                            <input type="text" id="sha1-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm" readonly>
+                        </div>
+                         <div>
+                            <label class="font-semibold">SHA-256</label>
+                            <input type="text" id="sha256-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Base64 Encoder/Decoder -->
+                <div id="base64-converter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="base64_converter_title">Base64 Encoder/Decoder</h2>
+                    <textarea id="base64-input" rows="8" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="base64_placeholder"></textarea>
+                    <div class="my-4 flex items-center justify-center gap-4">
+                        <button id="base64-encode-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" data-lang-key="encode">Encode</button>
+                        <button id="base64-decode-btn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600" data-lang-key="decode">Decode</button>
+                    </div>
+                     <textarea id="base64-output" rows="8" class="w-full bg-gray-900 rounded-md p-3 border border-gray-700" readonly></textarea>
+                </div>
+                
+                <!-- 10. URL Encoder/Decoder -->
+                <div id="url-converter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="url_converter_title">URL Encoder/Decoder</h2>
+                    <textarea id="url-input" rows="8" class="w-full bg-gray-900 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none border border-gray-700" placeholder-key="url_placeholder"></textarea>
+                    <div class="my-4 flex items-center justify-center gap-4">
+                        <button id="url-encode-btn" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" data-lang-key="encode">Encode</button>
+                        <button id="url-decode-btn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600" data-lang-key="decode">Decode</button>
+                    </div>
+                     <textarea id="url-output" rows="8" class="w-full bg-gray-900 rounded-md p-3 border border-gray-700" readonly></textarea>
+                </div>
+
+                <!-- 11. Color Converter -->
+                <div id="color-converter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="color_converter_title">Color Converter</h2>
+                    <div class="flex flex-col items-center gap-6">
+                        <input type="color" id="color-picker" value="#3b82f6" class="w-32 h-32 rounded-full border-4 border-gray-700 cursor-pointer">
+                        <div class="w-full max-w-md space-y-2">
+                             <div>
+                                <label class="font-semibold">HEX</label>
+                                <input type="text" id="hex-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm">
+                            </div>
+                            <div>
+                                <label class="font-semibold">RGB</label>
+                                <input type="text" id="rgb-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm">
+                            </div>
+                            <div>
+                                <label class="font-semibold">HSL</label>
+                                <input type="text" id="hsl-output" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 font-mono text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. Unit Converter -->
+                <div id="unit-converter" class="tool-card p-6 bg-gray-800 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-white" data-lang-key="unit_converter_title">PX to REM Converter</h2>
+                    <div class="w-full max-w-md mx-auto space-y-4">
+                        <div>
+                            <label for="base-font-size" data-lang-key="base_font_size">Base Font Size (px)</label>
+                            <input type="number" id="base-font-size" value="16" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 mt-1">
+                        </div>
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="w-full">
+                                <label for="px-input">PX</label>
+                                <input type="number" id="px-input" placeholder="16" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 mt-1">
+                            </div>
+                            <div class="pt-6 text-2xl">=</div>
+                             <div class="w-full">
+                                <label for="rem-input">REM</label>
+                                <input type="number" id="rem-input" placeholder="1" class="w-full bg-gray-900 rounded-md p-2 border border-gray-700 mt-1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const translations = {
+        en: {
+            title: "Web Tools",
+            language: "Language",
+            developer: "Developer: Denys Muzyka",
+            summarizer_title: "Text Summarizer",
+            summarizer_desc: "Upload a .txt file or paste text to get a brief summary. This is a demo and extracts the first few sentences.",
+            input_text: "Input Text",
+            summary: "Summary",
+            summarizer_placeholder: "Paste your text here...",
+            summarize_btn: "Summarize",
+            translator_title: "Translator",
+            translator_desc: "Translate text between Ukrainian and English. (UI Demo)",
+            translator_placeholder_from: "Enter text to translate...",
+            translator_placeholder_to: "Translation...",
+            translate_btn: "Translate",
+            word_counter_title: "Word & Character Counter",
+            word_counter_placeholder: "Type or paste your text here to count words and characters.",
+            words: "Words",
+            characters: "Characters",
+            sentences: "Sentences",
+            paragraphs: "Paragraphs",
+            case_converter_title: "Case Converter",
+            case_converter_placeholder: "Type or paste text to convert its case.",
+            uppercase: "UPPERCASE",
+            lowercase: "lowercase",
+            sentence_case: "Sentence case",
+            capitalized_case: "Capitalized Case",
+            password_generator_title: "Password Generator",
+            password_length: "Password Length",
+            include_uppercase: "Include Uppercase (A-Z)",
+            include_lowercase: "Include Lowercase (a-z)",
+            include_numbers: "Include Numbers (0-9)",
+            include_symbols: "Include Symbols (!@#$%^&*)",
+            generate_password: "Generate Password",
+            qr_code_generator_title: "QR Code Generator",
+            qr_placeholder: "Enter URL or text to generate QR code",
+            lorem_ipsum_title: "Lorem Ipsum Generator",
+            generate: "Generate",
+            copy: "Copy",
+            hash_generator_title: "Hash Generator",
+            hash_placeholder: "Enter text to generate hashes",
+            base64_converter_title: "Base64 Encoder/Decoder",
+            base64_placeholder: "Enter text for Base64 conversion",
+            encode: "Encode",
+            decode: "Decode",
+            url_converter_title: "URL Encoder/Decoder",
+            url_placeholder: "Enter URL or text for encoding/decoding",
+            color_converter_title: "Color Converter",
+            unit_converter_title: "PX to REM Converter",
+            base_font_size: "Base Font Size (px)",
+        },
+        ua: {
+            title: "Веб-Інструменти",
+            language: "Мова",
+            developer: "Розробник: Денис Музика",
+            summarizer_title: "Анотація Тексту",
+            summarizer_desc: "Завантажте .txt файл або вставте текст, щоб отримати коротку анотацію. Це демо-версія, яка витягує перші кілька речень.",
+            input_text: "Вхідний Текст",
+            summary: "Анотація",
+            summarizer_placeholder: "Вставте ваш текст сюди...",
+            summarize_btn: "Створити анотацію",
+            translator_title: "Перекладач",
+            translator_desc: "Перекладайте текст між українською та англійською мовами. (Демонстрація інтерфейсу)",
+            translator_placeholder_from: "Введіть текст для перекладу...",
+            translator_placeholder_to: "Переклад...",
+            translate_btn: "Перекласти",
+            word_counter_title: "Лічильник Слів та Символів",
+            word_counter_placeholder: "Введіть або вставте текст, щоб порахувати слова та символи.",
+            words: "Слова",
+            characters: "Символи",
+            sentences: "Речення",
+            paragraphs: "Абзаци",
+            case_converter_title: "Конвертер Регістру",
+            case_converter_placeholder: "Введіть або вставте текст для зміни регістру.",
+            uppercase: "ВЕРХНІЙ РЕГІСТР",
+            lowercase: "нижній регістр",
+            sentence_case: "Реченням",
+            capitalized_case: "З Великої Літери",
+            password_generator_title: "Генератор Паролів",
+            password_length: "Довжина Пароля",
+            include_uppercase: "Включити великі літери (A-Z)",
+            include_lowercase: "Включити малі літери (a-z)",
+            include_numbers: "Включити цифри (0-9)",
+            include_symbols: "Включити символи (!@#$%^&*)",
+            generate_password: "Згенерувати Пароль",
+            qr_code_generator_title: "Генератор QR-коду",
+            qr_placeholder: "Введіть URL або текст для генерації QR-коду",
+            lorem_ipsum_title: "Генератор Lorem Ipsum",
+            generate: "Згенерувати",
+            copy: "Копіювати",
+            hash_generator_title: "Генератор Хешів",
+            hash_placeholder: "Введіть текст для генерації хешів",
+            base64_converter_title: "Base64 Кодер/Декодер",
+            base64_placeholder: "Введіть текст для конвертації в Base64",
+            encode: "Кодувати",
+            decode: "Декодувати",
+            url_converter_title: "URL Кодер/Декодер",
+            url_placeholder: "Введіть URL або текст для кодування/декодування",
+            color_converter_title: "Конвертер Кольорів",
+            unit_converter_title: "Конвертер PX в REM",
+            base_font_size: "Базовий розмір шрифту (px)",
+        }
+    };
+
+    const tools = [
+        { id: 'summarizer', name_en: 'Text Summarizer', name_ua: 'Анотація Тексту' },
+        { id: 'translator', name_en: 'Translator', name_ua: 'Перекладач' },
+        { id: 'word-counter', name_en: 'Word Counter', name_ua: 'Лічильник слів' },
+        { id: 'case-converter', name_en: 'Case Converter', name_ua: 'Конвертер регістру' },
+        { id: 'password-generator', name_en: 'Password Generator', name_ua: 'Генератор паролів' },
+        { id: 'qr-generator', name_en: 'QR Code Generator', name_ua: 'Генератор QR-коду' },
+        { id: 'lorem-ipsum', name_en: 'Lorem Ipsum Generator', name_ua: 'Генератор Lorem Ipsum' },
+        { id: 'hash-generator', name_en: 'Hash Generator', name_ua: 'Генератор хешів' },
+        { id: 'base64-converter', name_en: 'Base64 Converter', name_ua: 'Base64 Конвертер' },
+        { id: 'url-converter', name_en: 'URL Converter', name_ua: 'URL Конвертер' },
+        { id: 'color-converter', name_en: 'Color Converter', name_ua: 'Конвертер кольорів' },
+        { id: 'unit-converter', name_en: 'Unit Converter', name_ua: 'Конвертер одиниць' },
+    ];
+    
+    let currentLang = 'en';
+
+    const toolMenu = document.getElementById('tool-menu');
+    
+    function populateToolMenu() {
+        toolMenu.innerHTML = '';
+        tools.forEach(tool => {
+            const li = document.createElement('li');
+            const button = document.createElement('button');
+            button.className = 'w-full text-left px-4 py-2 rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:bg-blue-600';
+            button.dataset.tool = tool.id;
+            button.textContent = currentLang === 'ua' ? tool.name_ua : tool.name_en;
+            li.appendChild(button);
+            toolMenu.appendChild(li);
+        });
+        
+        // Set first tool as active
+        toolMenu.querySelector('button').classList.add('bg-blue-600', 'text-white');
+    }
+
+    const switchLanguage = (lang) => {
+        if (lang === currentLang) return;
+        currentLang = lang;
+        document.documentElement.lang = lang;
+
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+        
+        document.querySelectorAll('[placeholder-key]').forEach(el => {
+            const key = el.getAttribute('placeholder-key');
+             if (translations[lang][key]) {
+                el.placeholder = translations[lang][key];
+            }
+        });
+        
+        populateToolMenu();
+
+        // Update active language button style
+        document.getElementById('lang-ua').classList.toggle('bg-blue-600', lang === 'ua');
+        document.getElementById('lang-ua').classList.toggle('bg-gray-700', lang !== 'ua');
+        document.getElementById('lang-en').classList.toggle('bg-blue-600', lang === 'en');
+        document.getElementById('lang-en').classList.toggle('bg-gray-700', lang !== 'en');
+
+        // Update translator labels manually
+        updateTranslatorLangs(document.getElementById('lang-from').textContent === 'Ukrainian');
+    };
+
+    document.getElementById('lang-ua').addEventListener('click', () => switchLanguage('ua'));
+    document.getElementById('lang-en').addEventListener('click', () => switchLanguage('en'));
+
+    // Tool switching logic
+    toolMenu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const toolId = e.target.dataset.tool;
+            document.querySelectorAll('.tool-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(toolId).classList.add('active');
+
+            document.querySelectorAll('#tool-menu button').forEach(btn => btn.classList.remove('bg-blue-600', 'text-white'));
+            e.target.classList.add('bg-blue-600', 'text-white');
+        }
+    });
+
+    // --- TOOL IMPLEMENTATIONS ---
+
+    // 1. Summarizer
+    const summarizeBtn = document.getElementById('summarize-btn');
+    const summarizerInput = document.getElementById('summarizer-input');
+    const summarizerOutput = document.getElementById('summarizer-output');
+    const fileInput = document.getElementById('file-input');
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                summarizerInput.value = event.target.result;
+            };
+            reader.readAsText(file);
+        }
+    });
+    
+    summarizeBtn.addEventListener('click', () => {
+        const text = summarizerInput.value.trim();
+        if (!text) {
+            summarizerOutput.value = '';
+            return;
+        }
+        // Simple summarizer: takes first 2-3 sentences.
+        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+        const summary = sentences.slice(0, 3).join(' ');
+        summarizerOutput.value = summary;
+    });
+
+    // 2. Translator
+    const swapLangBtn = document.getElementById('swap-lang-btn');
+    const langFrom = document.getElementById('lang-from');
+    const langTo = document.getElementById('lang-to');
+
+    function updateTranslatorLangs(isUaToEn) {
+        if (currentLang === 'ua') {
+            langFrom.textContent = isUaToEn ? 'Українська' : 'Англійська';
+            langTo.textContent = isUaToEn ? 'Англійська' : 'Українська';
+        } else {
+            langFrom.textContent = isUaToEn ? 'Ukrainian' : 'English';
+            langTo.textContent = isUaToEn ? 'English' : 'Ukrainian';
+        }
+    }
+
+    swapLangBtn.addEventListener('click', () => {
+         const isUaToEn = langFrom.textContent === 'Ukrainian' || langFrom.textContent === 'Українська';
+         updateTranslatorLangs(!isUaToEn);
+    });
+
+    // 3. Word Counter
+    const wordCounterInput = document.getElementById('word-counter-input');
+    wordCounterInput.addEventListener('input', () => {
+        const text = wordCounterInput.value.trim();
+        const words = text ? text.split(/\s+/).filter(Boolean) : [];
+        const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+        const paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
+        
+        document.getElementById('word-count').textContent = words.length;
+        document.getElementById('char-count').textContent = text.length;
+        document.getElementById('sentence-count').textContent = sentences.length;
+        document.getElementById('paragraph-count').textContent = paragraphs.length;
+    });
+    
+    // 4. Case Converter
+    const caseConverterInput = document.getElementById('case-converter-input');
+    document.querySelectorAll('.case-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const text = caseConverterInput.value;
+            const caseType = btn.dataset.case;
+            switch(caseType) {
+                case 'upper':
+                    caseConverterInput.value = text.toUpperCase();
+                    break;
+                case 'lower':
+                    caseConverterInput.value = text.toLowerCase();
+                    break;
+                case 'sentence':
+                    caseConverterInput.value = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
+                    break;
+                case 'capitalized':
+                    caseConverterInput.value = text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+                    break;
+            }
+        });
+    });
+
+    // 5. Password Generator
+    const passwordOutput = document.getElementById('password-output');
+    const passLengthSlider = document.getElementById('pass-length-slider');
+    const passLengthInput = document.getElementById('pass-length');
+    
+    passLengthSlider.addEventListener('input', (e) => passLengthInput.value = e.target.value);
+    passLengthInput.addEventListener('input', (e) => passLengthSlider.value = e.target.value);
+    
+    function generatePassword() {
+        const length = passLengthInput.value;
+        const incUppercase = document.getElementById('inc-uppercase').checked;
+        const incLowercase = document.getElementById('inc-lowercase').checked;
+        const incNumbers = document.getElementById('inc-numbers').checked;
+        const incSymbols = document.getElementById('inc-symbols').checked;
+        
+        const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lower = 'abcdefghijklmnopqrstuvwxyz';
+        const numbers = '0123456789';
+        const symbols = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+        
+        let charset = '';
+        if (incUppercase) charset += upper;
+        if (incLowercase) charset += lower;
+        if (incNumbers) charset += numbers;
+        if (incSymbols) charset += symbols;
+        
+        if (charset === '') {
+            passwordOutput.value = '';
+            return;
+        }
+        
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            password += charset.charAt(Math.floor(Math.random() * charset.length));
+        }
+        passwordOutput.value = password;
+    }
+    
+    document.getElementById('generate-password-btn').addEventListener('click', generatePassword);
+    document.getElementById('copy-password-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(passwordOutput.value);
+    });
+
+    // 6. QR Code Generator
+    const qrInput = document.getElementById('qr-input');
+    const qrcodeContainer = document.getElementById('qrcode');
+    let qrcode = new QRCode(qrcodeContainer, { width: 240, height: 240, colorDark: "#000000", colorLight: "#ffffff" });
+
+    function makeCode () {		
+        if (!qrInput.value) {
+            qrcode.clear();
+            return;
+        }
+        qrcode.makeCode(qrInput.value);
+    }
+    qrInput.addEventListener('input', makeCode);
+
+    // 7. Lorem Ipsum
+    const loremOutput = document.getElementById('lorem-output');
+    const loremText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    
+    document.getElementById('generate-lorem-btn').addEventListener('click', () => {
+        const count = document.getElementById('lorem-count').value;
+        loremOutput.value = Array(parseInt(count)).fill(loremText).join('\n\n');
+    });
+
+    document.getElementById('copy-lorem-btn').addEventListener('click', () => {
+         navigator.clipboard.writeText(loremOutput.value);
+    });
+
+    // 8. Hash Generator
+    const hashInput = document.getElementById('hash-input');
+    async function updateHashes() {
+        const text = hashInput.value;
+        if(!text) {
+             document.getElementById('md5-output').value = '';
+             document.getElementById('sha1-output').value = '';
+             document.getElementById('sha256-output').value = '';
+             return;
+        }
+        // This is a simplified MD5, not cryptographically secure
+        const md5 = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0).toString(16).padStart(32, '0');
+        
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        
+        const sha1Buffer = await crypto.subtle.digest('SHA-1', data);
+        const sha1Array = Array.from(new Uint8Array(sha1Buffer));
+        const sha1Hex = sha1Array.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        const sha256Buffer = await crypto.subtle.digest('SHA-256', data);
+        const sha256Array = Array.from(new Uint8Array(sha256Buffer));
+        const sha256Hex = sha256Array.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        document.getElementById('md5-output').value = md5;
+        document.getElementById('sha1-output').value = sha1Hex;
+        document.getElementById('sha256-output').value = sha256Hex;
+    }
+    hashInput.addEventListener('input', updateHashes);
+
+    // 9. Base64
+    const base64Input = document.getElementById('base64-input');
+    const base64Output = document.getElementById('base64-output');
+    document.getElementById('base64-encode-btn').addEventListener('click', () => {
+        try { base64Output.value = btoa(base64Input.value); } catch(e) { base64Output.value = "Error encoding text."; }
+    });
+     document.getElementById('base64-decode-btn').addEventListener('click', () => {
+        try { base64Output.value = atob(base64Input.value); } catch(e) { base64Output.value = "Error: Invalid Base64 string."; }
+    });
+    
+    // 10. URL
+    const urlInput = document.getElementById('url-input');
+    const urlOutput = document.getElementById('url-output');
+    document.getElementById('url-encode-btn').addEventListener('click', () => {
+        urlOutput.value = encodeURIComponent(urlInput.value);
+    });
+     document.getElementById('url-decode-btn').addEventListener('click', () => {
+        try { urlOutput.value = decodeURIComponent(urlInput.value); } catch(e) { urlOutput.value = "Error: Invalid URL string."; }
+    });
+
+    // 11. Color Converter
+    const colorPicker = document.getElementById('color-picker');
+    const hexOutput = document.getElementById('hex-output');
+    const rgbOutput = document.getElementById('rgb-output');
+    const hslOutput = document.getElementById('hsl-output');
+
+    function hexToRgb(hex) {
+        let r = 0, g = 0, b = 0;
+        if (hex.length == 4) {
+            r = "0x" + hex[1] + hex[1];
+            g = "0x" + hex[2] + hex[2];
+            b = "0x" + hex[3] + hex[3];
+        } else if (hex.length == 7) {
+            r = "0x" + hex[1] + hex[2];
+            g = "0x" + hex[3] + hex[4];
+            b = "0x" + hex[5] + hex[6];
+        }
+        return `rgb(${+r}, ${+g}, ${+b})`;
+    }
+
+    function hexToHsl(H) {
+        let r = 0, g = 0, b = 0;
+        if (H.length == 4) {
+            r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3];
+        } else if (H.length == 7) {
+            r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6];
+        }
+        r /= 255; g /= 255; b /= 255;
+        let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+        if (delta == 0) h = 0;
+        else if (cmax == r) h = ((g - b) / delta) % 6;
+        else if (cmax == g) h = (b - r) / delta + 2;
+        else h = (r - g) / delta + 4;
+        h = Math.round(h * 60);
+        if (h < 0) h += 360;
+        l = (cmax + cmin) / 2;
+        s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+        s = +(s * 100).toFixed(1);
+        l = +(l * 100).toFixed(1);
+        return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+
+    function updateColorValues(hex) {
+        hexOutput.value = hex;
+        rgbOutput.value = hexToRgb(hex);
+        hslOutput.value = hexToHsl(hex);
+    }
+    colorPicker.addEventListener('input', (e) => updateColorValues(e.target.value));
+    
+    // 12. Unit Converter
+    const baseFontSize = document.getElementById('base-font-size');
+    const pxInput = document.getElementById('px-input');
+    const remInput = document.getElementById('rem-input');
+
+    pxInput.addEventListener('input', () => {
+        const base = parseFloat(baseFontSize.value);
+        const px = parseFloat(pxInput.value);
+        if (base > 0 && !isNaN(px)) {
+            remInput.value = (px / base).toFixed(3);
+        } else {
+            remInput.value = '';
+        }
+    });
+
+    remInput.addEventListener('input', () => {
+        const base = parseFloat(baseFontSize.value);
+        const rem = parseFloat(remInput.value);
+        if (base > 0 && !isNaN(rem)) {
+            pxInput.value = (rem * base).toFixed(3);
+        } else {
+            pxInput.value = '';
+        }
+    });
+
+    baseFontSize.addEventListener('input', () => {
+        // Recalculate based on which input has a value
+        if (pxInput.value) pxInput.dispatchEvent(new Event('input'));
+        else if (remInput.value) remInput.dispatchEvent(new Event('input'));
+    });
+
+    // --- INITIALIZATION ---
+    function initialize() {
+        populateToolMenu();
+        switchLanguage('en');
+        document.getElementById('summarizer').classList.add('active');
+        generatePassword();
+        makeCode();
+        document.getElementById('generate-lorem-btn').click();
+        updateColorValues(colorPicker.value);
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
