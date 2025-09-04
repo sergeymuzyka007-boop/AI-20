@@ -4,59 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ШІ Анотатор Документів</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth.js/1.6.0/mammoth.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal flex items-center justify-center min-h-screen">
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="container mx-auto p-4 max-w-2xl">
-        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <h1 class="text-3xl font-bold mb-4 text-center">ШІ Анотатор Документів</h1>
-            <p class="text-gray-600 text-center mb-6">
-                Завантажте документ, щоб побачити, як ШІ може його аналізувати. Підтримує формати PDF та DOCX.
-            </p>
+    <div class="w-full max-w-4xl bg-gray-800 rounded-2xl p-8 shadow-2xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">ШІ Анотатор Документів</h1>
+            <p class="text-gray-400 text-lg">Завантажте документ для миттєвого резюме за допомогою штучного інтелекту.</p>
+        </header>
 
-            <div id="drop-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition duration-300 ease-in-out">
-                <input type="file" id="file-input" class="hidden" multiple>
-                <p class="text-gray-500">
-                    Перетягніть файл сюди або натисніть, щоб обрати
-                </p>
-                <p class="text-xs text-gray-400 mt-2">
-                    
-                </p>
+        <main class="mb-8">
+            <div id="drop-area" class="border-4 border-dashed border-gray-600 rounded-2xl p-8 text-center transition-colors duration-200 hover:border-blue-500 cursor-pointer">
+                <input type="file" id="file-input" class="hidden" accept=".txt,.json,.csv,.pdf,.docx">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v8"></path>
+                </svg>
+                <p class="mt-2 text-gray-400 text-sm">Перетягніть файл сюди або <span class="text-blue-400 font-medium">натисніть, щоб вибрати</span></p>
+                <p class="mt-1 text-xs text-gray-500">Підтримувані формати: .txt, .json, .csv, .pdf, .docx</p>
             </div>
 
-            <div id="status-message" class="hidden text-center mt-4 p-4 rounded-lg bg-blue-100 text-blue-600">
-                <div class="flex items-center justify-center">
-                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div id="status-message" class="mt-6 p-4 rounded-xl hidden">
+                <div class="flex items-center space-x-2">
+                    <svg id="loading-spinner" class="h-5 w-5 text-gray-400 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span id="message-text"></span>
+                    <p id="message-text" class="text-sm font-medium"></p>
+                </div>
+            </div>
+        </main>
+
+        <div id="content-container" class="mt-8 grid md:grid-cols-2 gap-8 hidden">
+            <!-- Оригінальний вміст -->
+            <div>
+                <h2 class="text-2xl font-semibold text-white mb-4">Оригінальний документ</h2>
+                <div class="bg-gray-700 p-4 rounded-xl text-gray-300 text-sm overflow-auto max-h-96">
+                    <pre id="original-content" class="whitespace-pre-wrap"></pre>
                 </div>
             </div>
 
-            <div id="content-container" class="hidden mt-6 bg-gray-50 p-6 rounded-lg shadow-inner">
-                <h2 class="text-2xl font-semibold mb-4 text-center">Результат анотації</h2>
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-700 mb-2">Оригінальний текст</h3>
-                        <div id="original-content" class="whitespace-pre-wrap p-4 bg-white border border-gray-200 rounded-md overflow-x-auto h-64"></div>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-700 mb-2">Анотований текст</h3>
-                        <div id="annotated-content" class="whitespace-pre-wrap p-4 bg-white border border-gray-200 rounded-md overflow-x-auto h-64"></div>
-                    </div>
+            <!-- Анотований вміст -->
+            <div>
+                <h2 class="text-2xl font-semibold text-white mb-4">Анотація ШІ</h2>
+                <div class="bg-blue-900 bg-opacity-30 p-4 rounded-xl text-blue-300 font-medium text-sm overflow-auto max-h-96">
+                    <p id="annotated-content"></p>
                 </div>
             </div>
-
-            <p class="text-xs text-center text-gray-400 mt-6">Розробник: Денис Музика</p>
-
         </div>
-    </div>
 
-    <script src="script.js"></script>
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>Розробник: Денис Музика</p>
+        </footer>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth.js/1.6.0/mammoth.browser.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
