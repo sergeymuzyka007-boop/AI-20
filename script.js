@@ -16,7 +16,10 @@ const apiKey = "AIzaSyB9ZyGuArCl-8zqAdMQWOAF0JthDp9irnQ";
 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
 // Обробник для кліка по області завантаження
-dropArea.addEventListener('click', () => fileInput.click());
+dropArea.addEventListener('click', () => {
+    // Напряму викликаємо клік на прихованому елементі
+    fileInput.click();
+});
 
 // Обробники для перетягування файлів
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
