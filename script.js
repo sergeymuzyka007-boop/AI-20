@@ -13,9 +13,7 @@ const annotatedContent = document.getElementById('annotated-content');
 
 // Конфігурація для API Gemini
 const apiKey = "AIzaSyB9ZyGuArCl-8zqAdMQWOAF0JthDp9irnQ";
-// Примітка: змінна apiUrl, визначена тут, може не захоплюватись правильно
-// Тому ми створимо URL безпосередньо в функції annotateDocument
-// const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
 // Обробник для кліка по області завантаження
 dropArea.addEventListener('click', () => fileInput.click());
@@ -63,7 +61,7 @@ async function handleFile(e) {
     let text = '';
 
     try {
-        showMessage(`Чтение файла .${fileType}... | Читання файлу .${fileType}...`, 'info', true);
+        showMessage(`Читання файлу .${fileType}...`, 'info', true);
         
         switch (fileType) {
             case 'txt':
@@ -78,21 +76,25 @@ async function handleFile(e) {
                 text = await readDocxFile(file);
                 break;
             default:
-                showMessage(`Неподдерживаемый тип файла: .${fileType}. | Непідтримуваний тип файлу: .${fileType}.`, 'error');
+                showMessage(`Непідтримуваний тип файлу: .${fileType}.`, 'error');
                 return;
         }
 
         originalContent.textContent = text;
-        showMessage('Файл успешно загружен. Выполняется аннотация... | Файл успішно завантажено. Виконується анотація...', 'info', true);
+        showMessage('Файл успішно завантажено. Виконується анотація...', 'info', true);
 
         const annotatedText = await annotateDocument(text);
-        annotatedContent.innerHTML = annotatedText;
-        showMessage('Аннотация завершена! | Анотацію завершено!', 'success');
-        contentContainer.classList.remove('hidden');
+        if (annotatedText) {
+            annotatedContent.innerHTML = annotatedText;
+            showMessage('Анотацію завершено!', 'success');
+            contentContainer.classList.remove('hidden');
+        } else {
+            showMessage('Не вдалося отримати анотацію для цього документа. Будь ласка, спробуйте інший файл або пізніше.', 'error');
+        }
 
     } catch (error) {
-        console.error('Ошибка обработки файла:', error);
-        showMessage('Ошибка при обработке документа. Пожалуйста, попробуйте снова. | Помилка під час обробки документа. Будь ласка, спробуйте знову.', 'error');
+        console.error('Помилка обробки файлу:', error);
+        showMessage('Помилка під час обробки документа. Будь ласка, спробуйте знову.', 'error');
     }
 }
 
@@ -127,65 +129,51 @@ async function readDocxFile(file) {
 }
 
 async function annotateDocument(text) {
-    const systemPrompt = `Ты — эксперт по аннотации документов. 
-    Твоя задача — проанализировать предоставленный текст и разметить ключевые фразы, даты, имена, места и другие важные термины, используя теги <span class="annotation">...</span>. 
-    Аннотируй только самые важные и релевантные термины. 
-    Если в тексте нет ничего, что можно было бы аннотировать, верни исходный текст без изменений.
-    Твой ответ должен содержать только размеченный HTML-код.
-    Например, "Изучение Марса началось <span class="annotation">в 1960-х годах</span>."
-    
-    Твоя задача также — распознать язык документа (русский или украинский) и разметить термины, используя правила языка, на котором написан документ. Если документ написан на русском языке, аннотируй на русском. Если на украинском, то на украинском.
-    `;
+    const systemPrompt = `Ти — експерт з аналізу документів. Твоя єдина задача — надати дуже коротке резюме документа, відповідаючи на питання "Про що цей документ?". Відповідь повинна бути лише одним, коротким реченням, без додаткової інформації, заголовків чи списків.`;
 
-    const userQuery = `Разметь следующий документ: ${text}`;
-    
-    // Створення URL-адреси безпосередньо перед запитом, щоб уникнути помилок з ключем
-    const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
+    const userQuery = `Розміть наступний документ: ${text}`;
     const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
         systemInstruction: { parts: [{ text: systemPrompt }] },
     };
 
-    const response = await fetch(requestUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-    if (!response.ok) {
-        throw new Error(`HTTP-ошибка! Статус: ${response.status}`);
-    }
+        if (!response.ok) {
+            console.error('HTTP Error:', response.status, response.statusText);
+            throw new Error(`HTTP-помилка! Статус: ${response.status}`);
+        }
 
-    const result = await response.json();
-    console.log("Full API Response:", result);
-
-    // Новый, более надежный блок проверки
-    if (result.candidates && result.candidates.length > 0) {
-        const candidate = result.candidates[0];
-        if (candidate.content?.parts?.[0]?.text) {
-            // Проверка на заблокированный контент (внутри кандидата)
-            const safetyRatings = candidate?.safetyRatings;
-            if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
-                throw new Error("Не удалось получить результат. Содержимое файла нарушает правила безопасности.");
+        const result = await response.json();
+        const candidate = result.candidates?.[0];
+        
+        if (candidate) {
+            // Перевірка, чи не був контент заблокований
+            if (candidate.finishReason === 'SAFETY') {
+                console.warn('Контент заблоковано через правила безпеки.');
+                return null;
             }
-            return candidate.content.parts[0].text;
+            
+            const annotatedText = candidate.content?.parts?.[0]?.text;
+            if (annotatedText) {
+                return annotatedText.trim();
+            }
         }
+        
+        return null;
+    } catch (error) {
+        console.error('Помилка під час виклику API:', error);
+        throw error;
     }
-
-    // Если кандидатов нет или они не содержат текст, ищем причину в promptFeedback
-    if (result.promptFeedback) {
-        const safetyRatings = result.promptFeedback.safetyRatings;
-        if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
-            throw new Error("Не удалось обработать документ. Текст был заблокирован из-за нарушений правил безопасности.");
-        }
-    }
-
-    // Если ни одна из проверок не сработала, выдаем общую ошибку
-    throw new Error("Не удалось получить результат от ИИ. Пожалуйста, попробуйте другой документ или позже.");
 }
 
-// Функция для отображения сообщений пользователю
+
+// Функція для відображення повідомлень користувачу
 function showMessage(text, type, showSpinner = false) {
     statusMessage.classList.remove('hidden');
     messageText.textContent = text;
