@@ -1,0 +1,16 @@
+/* Імпортуємо шрифт Inter з Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+/* Загальні стилі для тіла сторінки */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+}
+
+/* Стиль для анотованого тексту */
+.annotation {
+    background-color: #fca5a5; /* Червоний колір для фону */
+    font-weight: 600;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
