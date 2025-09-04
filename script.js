@@ -17,8 +17,11 @@ const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2
 
 // Обробник для кліка по області завантаження
 dropArea.addEventListener('click', () => {
-    // Напряму викликаємо клік на прихованому елементі
+    // Делаем поле видимым и сразу вызываем клик
+    fileInput.style.display = 'block';
     fileInput.click();
+    // И сразу скрываем его
+    fileInput.style.display = 'none';
 });
 
 // Обробники для перетягування файлів
