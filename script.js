@@ -13,7 +13,9 @@ const annotatedContent = document.getElementById('annotated-content');
 
 // Конфігурація для API Gemini
 const apiKey = "AIzaSyB9ZyGuArCl-8zqAdMQWOAF0JthDp9irnQ";
-const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+// Примітка: змінна apiUrl, визначена тут, може не захоплюватись правильно
+// Тому ми створимо URL безпосередньо в функції annotateDocument
+// const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
 // Обробник для кліка по області завантаження
 dropArea.addEventListener('click', () => fileInput.click());
@@ -136,12 +138,16 @@ async function annotateDocument(text) {
     `;
 
     const userQuery = `Разметь следующий документ: ${text}`;
+    
+    // Створення URL-адреси безпосередньо перед запитом, щоб уникнути помилок з ключем
+    const requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
     const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
         systemInstruction: { parts: [{ text: systemPrompt }] },
     };
 
-    const response = await fetch(apiUrl, {
+    const response = await fetch(requestUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
