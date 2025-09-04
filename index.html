@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ШІ Анотатор Документів</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="./styles.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
 
@@ -18,7 +19,7 @@
         </header>
 
         <main class="mb-8">
-            <div id="drop-area" class="border-4 border-dashed border-gray-600 rounded-2xl p-8 text-center transition-colors duration-200 hover:border-blue-500 cursor-pointer">
+            <div id="drop-area" class="drop-area-container border-4 border-dashed border-gray-600 rounded-2xl p-8 text-center transition-colors duration-200 hover:border-blue-500 cursor-pointer">
                 <input type="file" id="file-input" class="hidden" accept=".txt,.json,.csv,.pdf,.docx">
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v8"></path>
@@ -29,7 +30,7 @@
 
             <div id="status-message" class="mt-6 p-4 rounded-xl hidden">
                 <div class="flex items-center space-x-2">
-                    <svg id="loading-spinner" class="h-5 w-5 text-gray-400 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg id="loading-spinner" class="animate-spin h-5 w-5 text-gray-400 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
