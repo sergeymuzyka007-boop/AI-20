@@ -158,21 +158,31 @@ async function annotateDocument(text) {
     }
 
     const result = await response.json();
-    console.log("Full API Response:", result); // Додано для відладки
+    console.log("Full API Response:", result);
 
-    const candidate = result.candidates?.[0];
-    const safetyRatings = candidate?.safetyRatings;
-
-    // Перевірка на "заборонений" контент
-    if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
-        throw new Error("Не удалось получить результат. Возможно, содержимое файла нарушает правила безопасности.");
+    // Новый, более надежный блок проверки
+    if (result.candidates && result.candidates.length > 0) {
+        const candidate = result.candidates[0];
+        if (candidate.content?.parts?.[0]?.text) {
+            // Проверка на заблокированный контент (внутри кандидата)
+            const safetyRatings = candidate?.safetyRatings;
+            if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
+                throw new Error("Не удалось получить результат. Содержимое файла нарушает правила безопасности.");
+            }
+            return candidate.content.parts[0].text;
+        }
     }
 
-    if (candidate && candidate.content?.parts?.[0]?.text) {
-        return candidate.content.parts[0].text;
-    } else {
-        throw new Error("Не удалось получить результат от ИИ.");
+    // Если кандидатов нет или они не содержат текст, ищем причину в promptFeedback
+    if (result.promptFeedback) {
+        const safetyRatings = result.promptFeedback.safetyRatings;
+        if (safetyRatings && safetyRatings.some(rating => rating.blocked)) {
+            throw new Error("Не удалось обработать документ. Текст был заблокирован из-за нарушений правил безопасности.");
+        }
     }
+
+    // Если ни одна из проверок не сработала, выдаем общую ошибку
+    throw new Error("Не удалось получить результат от ИИ. Пожалуйста, попробуйте другой документ или позже.");
 }
 
 // Функция для отображения сообщений пользователю
