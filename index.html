@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ІІ Анотатор Документів</title>
+    <!-- Підключаємо стилі Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Підключаємо зовнішній файл зі стилями -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Підключаємо бібліотеки для читання PDF і DOCX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg p-8 space-y-8">
+
+        <!-- Заголовок і опис -->
+        <header class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800">ІІ Анотатор Документів | ИИ Аннотатор Документов</h1>
+            <p class="mt-2 text-gray-500">Завантажте документ, і ми покажемо, як міг би виглядати процес анотації за допомогою штучного інтелекту. Тепер з підтримкою форматів PDF та DOCX.</p>
+        </header>
+
+        <!-- Область завантаження файлів -->
+        <div id="drop-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer transition-colors duration-200 hover:border-blue-500">
+            <div class="flex flex-col items-center">
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4v-1a4 4 0 014-4h4l4-4m-6 0a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 015 5v1a5 5 0 01-5 5h-1a5 5 0 01-5-5V16a5 5 0 015-5z"></path>
+                </svg>
+                <p class="mt-2 text-sm text-gray-600">Перетягніть файл сюди або <span class="text-blue-600 font-semibold">натисніть, щоб вибрати файл</span></p>
+                <p class="mt-1 text-xs text-gray-400">Підтримувані формати: .txt, .json, .csv, .pdf, .docx</p>
+            </div>
+            <input type="file" id="file-input" class="hidden" accept=".txt,.json,.csv,.pdf,.docx">
+        </div>
+
+        <!-- Область для відображення повідомлень і завантаження -->
+        <div id="status-message" class="text-center hidden">
+            <div id="loading-spinner" class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto hidden"></div>
+            <p id="message-text" class="mt-2 text-gray-600"></p>
+        </div>
+
+        <!-- Контейнер для відображення вмісту -->
+        <div id="content-container" class="space-y-6 hidden">
+            <!-- Оригінальний вміст -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700">Оригінальний документ</h2>
+                <pre id="original-content" class="mt-2 bg-gray-50 p-4 rounded-md border border-gray-200 overflow-auto whitespace-pre-wrap text-sm text-gray-800 max-h-96"></pre>
+            </div>
+
+            <!-- Анотований вміст -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700">Анотований документ (від ІІ)</h2>
+                <pre id="annotated-content" class="mt-2 bg-gray-50 p-4 rounded-md border border-gray-200 overflow-auto whitespace-pre-wrap text-sm text-gray-800 max-h-96"></pre>
+            </div>
+        </div>
+        
+        <!-- Авторство -->
+        <footer class="mt-8 text-center text-gray-400 text-sm">
+            <p>Розробник: Денис Музика</p>
+        </footer>
+
+    </div>
+
+    <!-- Підключаємо зовнішній файл зі скриптами -->
+    <script src="script.js"></script>
+</body>
+</html>
